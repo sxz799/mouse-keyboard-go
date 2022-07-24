@@ -70,6 +70,6 @@ func DoRecord() {
 		marshal, _ := json.Marshal(steps)
 		ioutil.WriteFile("./script.txt", marshal, 0666)
 		fmt.Println("脚本录制完毕并写入script.txt文件")
-		fmt.Println("============================================================")
+		fmt.Println("===========================================================")
 	}
 }

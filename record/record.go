@@ -49,7 +49,7 @@ func DoRecord() {
 		nowTime := time.Now()
 		operation.WaitTime = nowTime.Sub(lastTime)
 		lastOperation = operation
-		if operation.WaitTime > time.Millisecond*70 {
+		if operation.WaitTime > time.Millisecond*700 {
 			lastTime = time.Now()
 			steps = append(steps, operation)
 		}
@@ -72,7 +72,6 @@ func DoRecord() {
 		lastTime = time.Now()
 		steps = append(steps, operation)
 		lastOperation = operation
-		fmt.Println("click", operation)
 	})
 	robotgo.EventHook(hook.KeyDown, []string{"esc"}, func(event hook.Event) {
 		robotgo.EventEnd()

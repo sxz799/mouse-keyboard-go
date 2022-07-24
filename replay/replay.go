@@ -31,6 +31,8 @@ func DoReplal() {
 	for _, step := range steps {
 		time.Sleep(step.WaitTime)
 		switch step.Type {
+		case "mouseMove":
+			utils.MouseMove(step)
 		case "mouseClick":
 			utils.MouseClick(step)
 		case "keyboard":

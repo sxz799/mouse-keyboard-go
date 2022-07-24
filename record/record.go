@@ -15,6 +15,24 @@ func DoRecord() {
 	fmt.Println("开始录制=======按下esc表示录制结束")
 	var steps []model.Operation
 	lastTime := time.Now()
+	var lastOperation model.Operation
+
+	robotgo.EventHook(hook.MouseMove, []string{}, func(event hook.Event) {
+
+		var operation model.Operation
+		operation.X = int(float64(event.X) / utils.Dpi)
+		operation.Y = int(float64(event.Y) / utils.Dpi)
+		operation.Type = "mouseMove"
+		nowTime := time.Now()
+		operation.WaitTime = nowTime.Sub(lastTime)
+		lastTime = time.Now()
+		lastOperation = operation
+		if lastOperation.Type != "mouseMove" || lastOperation.WaitTime > time.Millisecond*300 {
+			steps = append(steps, operation)
+		}
+
+	})
+
 	robotgo.EventHook(hook.MouseDown, []string{}, func(event hook.Event) {
 		var operation model.Operation
 		if event.Button == 1 {
@@ -29,12 +47,12 @@ func DoRecord() {
 		operation.WaitTime = nowTime.Sub(lastTime)
 		lastTime = time.Now()
 		steps = append(steps, operation)
+		lastOperation = operation
 	})
 	robotgo.EventHook(hook.KeyDown, []string{"esc"}, func(event hook.Event) {
 		robotgo.EventEnd()
 	})
 	robotgo.EventHook(hook.KeyDown, []string{}, func(event hook.Event) {
-		fmt.Println(string(event.Keychar))
 		var operation model.Operation
 		operation.Type = "keyboard"
 		operation.InputMsg = string(event.Keychar)
@@ -42,6 +60,7 @@ func DoRecord() {
 		operation.WaitTime = nowTime.Sub(lastTime)
 		lastTime = time.Now()
 		steps = append(steps, operation)
+		lastOperation = operation
 	})
 
 	s := robotgo.EventStart()

@@ -13,6 +13,10 @@ func Init() {
 	Dpi = float64(x2) / float64(x1)
 }
 
+func MouseMove(step model.Operation) {
+	robotgo.Move(step.X, step.Y)
+}
+
 func MouseClick(step model.Operation) {
 	robotgo.MoveClick(step.X, step.Y, step.MouseType)
 }

@@ -18,13 +18,18 @@ func DoRecord() {
 	var lastOperation model.Operation
 
 	handleDrag := func() {
-
 		if lastOperation.Type == "mouseDrag" {
+			steps = append(steps, lastOperation)
+		}
+	}
+	handleMove := func() {
+		if lastOperation.Type == "mouseMove" {
 			steps = append(steps, lastOperation)
 		}
 	}
 
 	robotgo.EventHook(hook.MouseDrag, []string{}, func(event hook.Event) {
+		handleMove()
 		var operation model.Operation
 		operation.X = int(float64(event.X) / utils.Dpi)
 		operation.Y = int(float64(event.Y) / utils.Dpi)
@@ -43,15 +48,16 @@ func DoRecord() {
 		operation.Type = "mouseMove"
 		nowTime := time.Now()
 		operation.WaitTime = nowTime.Sub(lastTime)
-		lastTime = time.Now()
 		lastOperation = operation
-
-		steps = append(steps, operation)
-
+		if operation.WaitTime > time.Millisecond*70 {
+			lastTime = time.Now()
+			steps = append(steps, operation)
+		}
 	})
 
 	robotgo.EventHook(hook.MouseDown, []string{}, func(event hook.Event) {
 		handleDrag()
+		handleMove()
 		var operation model.Operation
 		if event.Button == 1 {
 			operation.MouseType = "left"
@@ -73,6 +79,7 @@ func DoRecord() {
 	})
 	robotgo.EventHook(hook.KeyDown, []string{}, func(event hook.Event) {
 		handleDrag()
+		handleMove()
 		var operation model.Operation
 		operation.Type = "keyboard"
 		operation.InputMsg = string(event.Keychar)
@@ -87,19 +94,7 @@ func DoRecord() {
 	<-robotgo.EventProcess(s)
 	ok := robotgo.AddEvents("esc")
 	if ok && len(steps) > 1 {
-		var finalSteps []model.Operation
-		finalSteps = append(finalSteps, steps[0])
-		for i := 1; i < len(steps)-1; i++ {
-
-			if steps[i-1].Type == "mouseMove" && steps[i+1].Type == "mouseMove" && steps[i].WaitTime < time.Millisecond*50 {
-				continue
-			} else {
-				finalSteps = append(finalSteps, steps[i])
-			}
-
-		}
-		finalSteps = append(finalSteps, steps[len(steps)-1])
-		marshal, _ := json.Marshal(finalSteps)
+		marshal, _ := json.Marshal(steps)
 		ioutil.WriteFile("./script.txt", marshal, 0666)
 		fmt.Println("脚本录制完毕并写入script.txt文件")
 		fmt.Println("===========================================================")

@@ -18,7 +18,6 @@ func DoRecord() {
 	var lastOperation model.Operation
 
 	robotgo.EventHook(hook.MouseMove, []string{}, func(event hook.Event) {
-
 		var operation model.Operation
 		operation.X = int(float64(event.X) / utils.Dpi)
 		operation.Y = int(float64(event.Y) / utils.Dpi)
@@ -27,10 +26,11 @@ func DoRecord() {
 		operation.WaitTime = nowTime.Sub(lastTime)
 		lastTime = time.Now()
 		lastOperation = operation
-		if lastOperation.Type != "mouseMove" || lastOperation.WaitTime > time.Millisecond*300 {
+		if lastOperation.Type != "mouseMove" {
+			steps = append(steps, operation)
+		} else if lastOperation.WaitTime > time.Millisecond*50 {
 			steps = append(steps, operation)
 		}
-
 	})
 
 	robotgo.EventHook(hook.MouseDown, []string{}, func(event hook.Event) {

@@ -14,7 +14,7 @@ func main() {
 	for {
 		var id string
 		fmt.Println("欢迎使用MouseKeyboardGo")
-		fmt.Println("MouseKeyboardGo可以录制鼠标移动、点击操作和键盘输出(不支持拖动)")
+		fmt.Println("MouseKeyboardGo可以录制鼠标操作(移动、点击、拖动)和键盘输出")
 		fmt.Println("============================================================")
 		fmt.Println(" 0 ---退出")
 		fmt.Println(" 1 ---录制操作")

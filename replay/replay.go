@@ -24,7 +24,11 @@ func DoReplal() {
 	}()
 	f1, _ := ioutil.ReadFile("./script.txt")
 	var steps []model.Operation
-	json.Unmarshal(f1, &steps)
+	err := json.Unmarshal(f1, &steps)
+	if err != nil {
+		fmt.Println("脚本反序列化失败！")
+		return
+	}
 	if len(steps) < 1 {
 		fmt.Println("录制内容为空")
 	}
@@ -33,6 +37,8 @@ func DoReplal() {
 		switch step.Type {
 		case "mouseMove":
 			utils.MouseMove(step)
+		case "mouseDrag":
+			utils.MouseDrag(step)
 		case "mouseClick":
 			utils.MouseClick(step)
 		case "keyboard":

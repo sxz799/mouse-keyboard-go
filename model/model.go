@@ -7,6 +7,7 @@ type Operation struct {
 	X         int
 	Y         int
 	MouseType string
-	InputMsg  string
+	Key       string
+	InputStr  string
 	WaitTime  time.Duration
 }

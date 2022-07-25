@@ -5,19 +5,20 @@ import (
 	"GSAutoHSProject/utils"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"time"
+
 	"github.com/go-vgo/robotgo"
 	hook "github.com/robotn/gohook"
-	"io/ioutil"
-	"os"
-	"time"
 )
 
-func DoReplal() {
-	fmt.Println("正在执行中...(您可以按 Ctrl+Q 结束本程序)")
+func DoReplay() {
+	fmt.Println("正在执行中...(您可以按 Esc 退出)")
+	stopFlag := false
 	go func() {
-		robotgo.EventHook(hook.KeyDown, []string{"q", "ctrl"}, func(event hook.Event) {
+		robotgo.EventHook(hook.KeyHold, []string{"esc"}, func(event hook.Event) {
 			robotgo.EventEnd()
-			os.Exit(1)
+			stopFlag = true
 		})
 		s := robotgo.EventStart()
 		<-robotgo.EventProcess(s)
@@ -33,6 +34,9 @@ func DoReplal() {
 		fmt.Println("录制内容为空")
 	}
 	for _, step := range steps {
+		if stopFlag {
+			return
+		}
 		time.Sleep(step.WaitTime)
 		switch step.Type {
 		case "mouseMove":
@@ -41,9 +45,16 @@ func DoReplal() {
 			utils.MouseDrag(step)
 		case "mouseClick":
 			utils.MouseClick(step)
-		case "keyboard":
-			utils.Input(step.InputMsg)
+		case "keyboardDown":
+			utils.KeyboardDown(step)
+		case "keyboardDownWithCtrl":
+			utils.KeyboardDownWithCtrl(step)
+		case "keyboardDownWithAlt":
+			utils.KeyboardDownWithAlt(step)
+		case "inputStr":
+			utils.InputStr(step.InputStr)
 		}
+
 	}
 	fmt.Println("============================================================")
 }

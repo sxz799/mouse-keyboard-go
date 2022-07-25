@@ -5,14 +5,15 @@ import (
 	"GSAutoHSProject/utils"
 	"encoding/json"
 	"fmt"
-	"github.com/go-vgo/robotgo"
-	hook "github.com/robotn/gohook"
 	"io/ioutil"
 	"time"
+
+	"github.com/go-vgo/robotgo"
+	hook "github.com/robotn/gohook"
 )
 
 func DoRecord() {
-	fmt.Println("开始录制=======按下esc表示录制结束")
+	fmt.Println("录制中...........按下f9结束录制")
 	var steps []model.Operation
 	lastTime := time.Now()
 	var lastOperation model.Operation
@@ -34,8 +35,7 @@ func DoRecord() {
 		operation.X = int(float64(event.X) / utils.Dpi)
 		operation.Y = int(float64(event.Y) / utils.Dpi)
 		operation.Type = "mouseDrag"
-		nowTime := time.Now()
-		operation.WaitTime = nowTime.Sub(lastTime)
+		operation.WaitTime = time.Now().Sub(lastTime)
 		lastTime = time.Now()
 		lastOperation = operation
 	})
@@ -46,10 +46,9 @@ func DoRecord() {
 		operation.X = int(float64(event.X) / utils.Dpi)
 		operation.Y = int(float64(event.Y) / utils.Dpi)
 		operation.Type = "mouseMove"
-		nowTime := time.Now()
-		operation.WaitTime = nowTime.Sub(lastTime)
+		operation.WaitTime = time.Now().Sub(lastTime)
 		lastOperation = operation
-		if operation.WaitTime > time.Millisecond*700 {
+		if operation.WaitTime > time.Millisecond*400 {
 			lastTime = time.Now()
 			steps = append(steps, operation)
 		}
@@ -73,17 +72,49 @@ func DoRecord() {
 		steps = append(steps, operation)
 		lastOperation = operation
 	})
-	robotgo.EventHook(hook.KeyDown, []string{"esc"}, func(event hook.Event) {
+	robotgo.EventHook(hook.KeyHold, []string{"f9"}, func(event hook.Event) {
 		robotgo.EventEnd()
 	})
-	robotgo.EventHook(hook.KeyDown, []string{}, func(event hook.Event) {
+
+	robotgo.EventHook(hook.KeyHold, []string{"ctrl"}, func(event hook.Event) {
+		if event.Rawcode == 162 {
+			return
+		}
 		handleDrag()
 		handleMove()
 		var operation model.Operation
-		operation.Type = "keyboard"
-		operation.InputMsg = string(event.Keychar)
-		nowTime := time.Now()
-		operation.WaitTime = nowTime.Sub(lastTime)
+		operation.Type = "keyboardDownWithCtrl"
+		operation.Key = string(event.Rawcode)
+		operation.WaitTime = time.Now().Sub(lastTime)
+		lastTime = time.Now()
+		steps = append(steps, operation)
+		lastOperation = operation
+	})
+	robotgo.EventHook(hook.KeyHold, []string{"alt"}, func(event hook.Event) {
+		if event.Rawcode == 164 {
+			return
+		}
+		handleDrag()
+		handleMove()
+		var operation model.Operation
+		operation.Type = "keyboardDownWithAlt"
+		operation.Key = string(event.Rawcode)
+		operation.WaitTime = time.Now().Sub(lastTime)
+		lastTime = time.Now()
+		steps = append(steps, operation)
+		lastOperation = operation
+	})
+
+	robotgo.EventHook(hook.KeyDown, []string{}, func(event hook.Event) {
+		if lastOperation.Type == "keyboardDownWithCtrl" || lastOperation.Type == "keyboardDownWithAlt" {
+			return
+		}
+		handleDrag()
+		handleMove()
+		var operation model.Operation
+		operation.Type = "keyboardDown"
+		operation.Key = string(event.Keychar)
+		operation.WaitTime = time.Now().Sub(lastTime)
 		lastTime = time.Now()
 		steps = append(steps, operation)
 		lastOperation = operation
@@ -91,8 +122,8 @@ func DoRecord() {
 
 	s := robotgo.EventStart()
 	<-robotgo.EventProcess(s)
-	ok := robotgo.AddEvents("esc")
-	if ok && len(steps) > 1 {
+	ok := robotgo.AddEvents("f9")
+	if ok && len(steps) > 0 {
 		marshal, _ := json.Marshal(steps)
 		ioutil.WriteFile("./script.txt", marshal, 0666)
 		fmt.Println("脚本录制完毕并写入script.txt文件")

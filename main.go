@@ -4,9 +4,8 @@ import (
 	"GSAutoHSProject/record"
 	"GSAutoHSProject/replay"
 	"GSAutoHSProject/utils"
-	"os"
-
 	"fmt"
+	"os"
 )
 
 func main() {
@@ -14,7 +13,7 @@ func main() {
 	for {
 		var id string
 		fmt.Println("欢迎使用MouseKeyboardGo")
-		fmt.Println("MouseKeyboardGo可以录制鼠标操作(移动、点击、拖动)和键盘输出")
+		fmt.Println("MouseKeyboardGo可以录制鼠标操作(移动、点击、拖动)和键盘操作")
 		fmt.Println("============================================================")
 		fmt.Println(" 0 ---退出")
 		fmt.Println(" 1 ---录制操作")
@@ -25,7 +24,7 @@ func main() {
 		case "1":
 			record.DoRecord()
 		case "2":
-			replay.DoReplal()
+			replay.DoReplay()
 		case "0":
 			os.Exit(1)
 		}

@@ -27,6 +27,21 @@ func MouseDrag(step model.Operation) {
 func MouseClick(step model.Operation) {
 	robotgo.MoveClick(step.X, step.Y, step.MouseType)
 }
-func Input(msg string) {
+
+func KeyboardDown(step model.Operation) {
+	robotgo.KeyDown(step.Key)
+}
+
+func KeyboardDownWithCtrl(step model.Operation) {
+	robotgo.KeySleep = 100
+	robotgo.KeyTap(step.Key, "ctrl")
+}
+
+func KeyboardDownWithAlt(step model.Operation) {
+	robotgo.KeySleep = 100
+	robotgo.KeyTap(step.Key, "alt")
+}
+
+func InputStr(msg string) {
 	robotgo.TypeStr(msg)
 }

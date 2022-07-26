@@ -23,9 +23,9 @@ func DoReplay() {
 		s := robotgo.EventStart()
 		<-robotgo.EventProcess(s)
 	}()
-	f1, _ := ioutil.ReadFile("./script.txt")
+	bytes, _ := ioutil.ReadFile("./script.txt")
 	var steps []model.Operation
-	err := json.Unmarshal(f1, &steps)
+	err := json.Unmarshal(bytes, &steps)
 	if err != nil {
 		fmt.Println("脚本反序列化失败！")
 		return

@@ -13,7 +13,7 @@ import (
 )
 
 func DoRecord() {
-	fmt.Println("录制中...........按下f9结束录制")
+	fmt.Println("录制中...........按下f10结束录制")
 	var steps []model.Operation
 	lastTime := time.Now()
 	var lastOperation model.Operation
@@ -48,7 +48,7 @@ func DoRecord() {
 		operation.Type = "mouseMove"
 		operation.WaitTime = time.Now().Sub(lastTime)
 		lastOperation = operation
-		if operation.WaitTime > time.Millisecond*400 {
+		if operation.WaitTime > time.Millisecond*500 {
 			lastTime = time.Now()
 			steps = append(steps, operation)
 		}
@@ -66,13 +66,12 @@ func DoRecord() {
 		operation.X = int(float64(event.X) / utils.Dpi)
 		operation.Y = int(float64(event.Y) / utils.Dpi)
 		operation.Type = "mouseClick"
-		nowTime := time.Now()
-		operation.WaitTime = nowTime.Sub(lastTime)
+		operation.WaitTime = time.Now().Sub(lastTime)
 		lastTime = time.Now()
 		steps = append(steps, operation)
 		lastOperation = operation
 	})
-	robotgo.EventHook(hook.KeyHold, []string{"f9"}, func(event hook.Event) {
+	robotgo.EventHook(hook.KeyHold, []string{"f10"}, func(event hook.Event) {
 		robotgo.EventEnd()
 	})
 
@@ -122,14 +121,16 @@ func DoRecord() {
 
 	s := robotgo.EventStart()
 	<-robotgo.EventProcess(s)
-	ok := robotgo.AddEvents("f9")
+	ok := robotgo.AddEvents("f10")
 	if ok && len(steps) > 0 {
 		marshal, _ := json.Marshal(steps)
 		ioutil.WriteFile("./script.txt", marshal, 0666)
 		fmt.Println("脚本录制完毕并写入script.txt文件")
 		fmt.Println("===========================================================")
+		fmt.Printf("\n\n\n")
 	} else {
 		fmt.Println("脚本为空")
 		fmt.Println("===========================================================")
+		fmt.Printf("\n\n\n")
 	}
 }

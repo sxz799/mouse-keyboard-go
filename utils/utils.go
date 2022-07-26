@@ -19,7 +19,7 @@ func MouseMove(step model.Operation) {
 func MouseDrag(step model.Operation) {
 	robotgo.Toggle("left")
 	robotgo.MilliSleep(50)
-	robotgo.MoveSmooth(step.X, step.Y, 0.7, 0.7)
+	robotgo.MoveSmooth(step.X, step.Y, 0.8, 0.8)
 	robotgo.MilliSleep(1200)
 	robotgo.Toggle("left", "up")
 
